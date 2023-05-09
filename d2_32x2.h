@@ -73,8 +73,12 @@ inline std::pair<large_int, bool> d2_32x2(double x)
         }
     }();
     if (up.neg()){
-        std::int32_t in = -1;
-        return {{ -r.lo_, in-r.hi_ }, true };
+        std::int32_t in = 0;
+        if (r.lo_==0){
+            return {{ 0, 1+~r.hi_ }, true };
+        } else {
+            return {{ 1+~r.lo_, ~r.hi_ }, true };
+        }
     } else {
         return { r, true };
     }
