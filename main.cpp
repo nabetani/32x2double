@@ -2,6 +2,7 @@
 #include <bit>
 #include <format>
 #include <iostream>
+#include <limits>
 
 int test_one(double x)
 {
@@ -53,6 +54,12 @@ int main()
             failed += test((1ull << i) - (1ull << 31));
         }
     }
+    using lim = std::numeric_limits<double>;
+    failed += test( lim::infinity() );
+    failed += test( lim::quiet_NaN() );
+    failed += test( lim::signaling_NaN() );
+    failed += test( lim::denorm_min() );
+
     std::cout << std::format("failed={}", failed) << std::endl;
 
     return 0;
