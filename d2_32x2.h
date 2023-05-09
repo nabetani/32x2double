@@ -15,9 +15,13 @@ struct large_int
 struct u32_pair
 {
     std::uint32_t lo_, hi_;
-    constexpr bool is_zero() const
+    constexpr bool is_like_zero() const
     {
-        return (hi_ & 0x7fff'ffff) == 0 && lo_ == 0;
+        return exp()==0;
+    }
+    constexpr bool is_nan_inf() const
+    {
+        return exp()==0x7ff;
     }
     constexpr int neg() const
     {
@@ -53,13 +57,20 @@ inline std::uint32_t shift(std::uint32_t v, int x)
 inline std::pair<large_int, bool> d2_32x2(double x)
 {
     auto up = std::bit_cast<u32_pair>(x);
-    if (up.is_zero())
+    if (up.is_like_zero())
     {
         return {{0, 0}, true};
     }
+    if (up.is_nan_inf())
+    {
+        return {{}, false};
+    }
+    auto e = up.exp() + (-52 - 1023);
+    if (10<e){
+        return {{},false};
+    }
     auto f0 = up.hfrac();
     auto f1 = up.lo_;
-    auto e = up.exp() + (-52 - 1023);
     large_int r = [&]()->large_int {
         if (0 <= e)
         {
